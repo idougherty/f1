@@ -1,32 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>F1 Racing Simulator</title>
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400&display=swap" rel="stylesheet">
+    <title>Formula Fun</title>
     <style>
-		body, html {
+		/* body {
+			background-color: #222;
+		} */
+		body {
+			background-image: url("lizards.webp");
+			/* background-image: linear-gradient(45deg, #888 25%, transparent 25%), linear-gradient(-45deg, #888 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #888 75%), linear-gradient(-45deg, transparent 75%, #888 75%); */
+			background-size: 200px 200px;
+			/* background-position: 0 0, 0 50px, 50px -50px, -50px 0px; */
+		}
+
+		.header {
+			margin: 1em auto;
+			padding: 1em;
+			width: max-content;
+			font-family: Syncopate;
+			font-size: 2em;
+			font-weight: 400;
+			letter-spacing: .4em;
+			color: #FAFF70;
+			text-align: center;
+			background-color: rgba(0, 0, 0, .7);
+		}
+
+		.header-text {
 			margin: 0;
-			overflow: hidden;
-			width: 100%;
+		}
+
+		.main-container {
+			margin: 0 auto;
+			width: 60em;
+			letter-spacing: 0.1em;
+			background-color: #222;
+		}
+
+		a {
+			text-decoration: none;
+			color: #eee;
+		}
+
+		nav {
+			font-family: Syncopate;
+			list-style: none;
+		}
+
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+		}
+
+		li {
+			display: inline;
+			float: left;
+			padding: 10px 0px;
+			width: 33.33%;
+			text-align: center;
+			background-color: #444;
+		}
+
+		li:hover {
+			background-color: #666;
 		}
 	</style>
 </head>
 <body>
 	<!--<canvas id="canvas" width="1000px" height="1000px"></canvas>
 	<script type="text/javascript" src="main.js"></script>-->
-	<div style="text-align:center">
-		<h1> formula fun!</h1>
+	<div class="header">
+		<h1 class="header-text">FORMULA FUN!</h1>
 	</div>
-	<!--the nav bar -->
-	<div>
-		<nav>
-		  <ul style="list-style: none; margin:0; padding : 5px; background-color: aqua; ">
-			<li style="color: black; float: left; margin-left: 10%;"><a style="color: black; text-decoration: none;" href="car.html">car</a></li>
-			<li style="float: left; margin-left: 35%;"><a style="color: black; text-decoration: none;" href="team.html">team</a></li>
-			<li style="float: inline-end; margin-left: 90%;"><a style="color: black; text-decoration: none;" href="race.html">race</a></li>
-		 </ul>
-		</nav>
+	<!-- page body -->
+	<div class="main-container">
+		<!--the nav bar -->
+		<div>
+			<nav>
+			  <ul>
+				<a href="car.html"><li>car</li></a>
+				<a href="team.html"><li>team</li></a>
+				<a href="race.html"><li>race</li></a>
+			 </ul>
+			</nav>
+		</div>
+
+		<!-- stats section -->
+		<div>
+		</div>
+
+		<!-- news section -->
+		<div>
+		</div>
 	</div>
-	<!--I know these both inlude data from a js file so I made them canvases-->
+	<!-- I know these both inlude data from a js file so I made them canvases
 	<canvas id="news" width="500%" height="1000px" ></canvas>
-	<canvas id="stats" width="40%" height="1000px" ></canvas>
+	<canvas id="stats" width="40%" height="1000px" ></canvas> -->
 </body>
