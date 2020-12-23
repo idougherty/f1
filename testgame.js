@@ -86,6 +86,7 @@ class CupSwapper {
         const idx = Math.floor(Math.random() * this.cups.length);
         this.activeCups = [idx, (idx + 1) % this.cups.length];
         this.introFrames = 200;
+        this.gameOver = false;
     }
 
     update() {
@@ -120,14 +121,21 @@ class CupSwapper {
                         this.cups[2].clickable = true;
                     }
                 }
-            } else {
+            } else if(!this.gameOver) {
                 for(let cup of this.cups) {
                     cup.update();
                     if(cup.active) {
                         for(let cup of this.cups) {
                             cup.clickable = false;
                         }
+                        this.gameOver = true;
                         cup.visible = false;
+                    }
+                }
+            } else {    
+                if(this.gameOver) {
+                    for(let cup of this.cups) {
+                        cup.y--;
                     }
                 }
             }
