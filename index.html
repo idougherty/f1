@@ -4,104 +4,8 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,400;1,700&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400&display=swap" rel="stylesheet">
+	<link rel = "stylesheet" href="webStyles.css">
     <title>Formula Fun</title>
-    <style>
-		body {
-			background-image: linear-gradient(13deg, #111 60%, #fff 60%, #fff 62%, #E0CB41 62%, #E0CB41 67%, #fff 67%, #fff 69%, #273026 69%);
-			background-size: 100%;
-			background-repeat: no-repeat;
-			background-attachment: fixed;
-		}
-
-		.header {
-			margin: 1em auto;
-			padding: 1em;
-			width: max-content;
-			font-family: Syncopate;
-			font-size: 2em;
-			font-weight: 400;
-			letter-spacing: .4em;
-			color: #FAFF70;
-			text-align: center;
-			background-color: rgba(0, 0, 0, .7);
-		}
-
-		.header-text {
-			margin: 0;
-		}
-
-		.main-container {
-			margin: 0 auto 4em;
-			width: 60em;
-			letter-spacing: 0.1em;
-			border-radius: .5em;
-			background-color: #222;
-			font-family: Montserrat;
-			color: #eee;
-		}
-
-		.sub-header {
-			font-size: 1.5em;
-		}
-
-		.stats {
-			padding: 3em;
-		}
-
-		.news {
-			padding: 3em;
-		}
-
-		a {
-			text-decoration: none;
-			color: #eee;
-		}
-
-		nav {
-			font-family: Montserrat;
-			font-weight: Bold;
-			list-style: none;
-		}
-
-		ul {
-			list-style-type: none;
-			margin: 0;
-			padding: 0;
-		}
-
-		li:first-child {
-			border-top-left-radius: .5em;
-		}
-
-		li:last-child {
-			border-top-right-radius: .5em;
-		}
-
-		li {
-			display: inline;
-			float: left;
-			padding: 10px 0px;
-			width: 25%;
-			text-align: center;
-			background-color: #373737;
-			border-bottom: 2px solid #666;
-        	cursor: pointer;
-		}
-
-		a:only-child {
-			display: inline-block;
-			width: 100%;
-			height: 100%;
-		}
-
-		li:not(.active-tab):hover {
-			background-color: #555;
-		}
-
-		.active-tab {
-			background-color: #454545 !important;
-		}
-	</style>
 </head>
 <body>
 	<!--<canvas id="canvas" width="1000px" height="1000px"></canvas>
@@ -113,8 +17,8 @@
 	<div class="main-container">
 		<!--the nav bar -->
 		<div>
-			<nav>
-			  <ul>
+			<nav class = "topNav">
+			  <ul class = "top-ul">
 				<li class="active-tab">Home</a></li>
 				<li onclick="location.href='car.html'">Car</li>
 				<li onclick="location.href='team.html'">Team</li>
