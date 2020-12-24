@@ -22,6 +22,10 @@ let gad = document.querySelector('.gad');
 let modalGad = document.querySelector('.modal-gad');
 let gadC = document.querySelector('.gad-c');
 
+let eDO = document.querySelector('.driver');
+let modalED0 = document.querySelector('.modal-e-driver');
+let eDOC = document.querySelector('.ed-c');
+
 
 chas.addEventListener('click', function(){
     modalChas.classList.add('bg-active');
@@ -64,4 +68,11 @@ gad.addEventListener('click', function(){
 });
 gadC.addEventListener('click', function(){
     modalGad.classList.remove('bg-active');
+});
+
+eDO.addEventListener('click', function(){
+    modalED0.classList.add('bg-active');
+});
+eDOC.addEventListener('click', function(){
+    modalED0.classList.remove('bg-active');
 });
