@@ -29,14 +29,6 @@ function updatePos(e) {
     mouse.y = e.clientY;
 }
 
-// class Sprite {
-//     constructor(img, width, height) {
-//         this.img = img;
-//         this.width = width;
-//         this.height = height;
-//     }
-// }
-
 class GameObject {
     constructor(sprite, x, y, clickable = false, active = false) {
         this.clickable = clickable;
@@ -70,7 +62,7 @@ class GameObject {
 class CupSwapper {
     constructor() {
         let cupSprite = new Image(445/4, 428/4);
-        cupSprite.src = "cup.png";
+        cupSprite.src = "assets/cup.png";
         this.cups = [new GameObject(cupSprite, canvas.width * 1/4 - cupSprite.width/2, canvas.height/2 - cupSprite.height/2 - 200, false),
                       new GameObject(cupSprite, canvas.width * 2/4 - cupSprite.width/2, canvas.height/2 - cupSprite.height/2 - 200, false),
                       new GameObject(cupSprite, canvas.width * 3/4 - cupSprite.width/2, canvas.height/2 - cupSprite.height/2 - 200, false)];
@@ -80,7 +72,7 @@ class CupSwapper {
         this.curAngle = 0;
 
         let tireSprite = new Image(445/4, 428/4);
-        tireSprite.src = "tire.png";
+        tireSprite.src = "assets/tire.png";
         this.tire = new GameObject(tireSprite, canvas.width * 2/4 - tireSprite.width/2, canvas.height/2 - tireSprite.height/2, false);
 
         const idx = Math.floor(Math.random() * this.cups.length);
