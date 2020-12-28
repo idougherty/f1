@@ -29,14 +29,6 @@ function updatePos(e) {
     mouse.y = e.clientY;
 }
 
-// class Sprite {
-//     constructor(img, width, height) {
-//         this.img = img;
-//         this.width = width;
-//         this.height = height;
-//     }
-// }
-
 class GameObject {
     constructor(sprite, x, y, clickable = false, active = false) {
         this.clickable = clickable;
