@@ -63,44 +63,44 @@ a {
         list-style: none;
 }
 
-    .top-ul {
-        list-style-type: none;
-        margin: 0;
-        padding: 0;
-    }
+.top-ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
 
-    li:first-child {
-        border-top-left-radius: .5em;
-    }
+li:first-child {
+    border-top-left-radius: .5em;
+}
 
-    li:last-child {
-        border-top-right-radius: .5em;
-    }
+li:last-child {
+    border-top-right-radius: .5em;
+}
 
-    li {
-        display: inline;
-        float:left;
-        padding: 10px 0px;
-        width: 25%;
-        text-align: center;
-        background-color: #373737;
-        border-bottom: 2px solid #666;
-        cursor: pointer;
-    }
+li {
+    display: inline;
+    float:left;
+    padding: 10px 0px;
+    width: 25%;
+    text-align: center;
+    background-color: #373737;
+    border-bottom: 2px solid #666;
+    cursor: pointer;
+}
 
-    a:only-child {
-        display: inline-block;
-        width: 100%;
-        height: 100%;
-    }
+a:only-child {
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+}
 
-    li:not(.active-tab):hover {
-        background-color: #555;
-    }
+li:not(.active-tab):hover {
+    background-color: #555;
+}
 
-    .active-tab {
-        background-color: #454545 !important;
-    }
+.active-tab {
+    background-color: #454545 !important;
+}
 
 .chas{
     visibility: visible;

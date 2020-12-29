@@ -57,8 +57,9 @@ class Runner {
 class lavaRunner {
     constructor() {
         this.runner = new Runner();
-        this.lava = -150;
-        this.countDown = 3;
+        this.lavaX = -150;
+        this.lavaV = 0;
+        this.countDown = 5;
         this.gameOver = false;
 
         let finishLineSprite = new Image(20, 80);
@@ -67,14 +68,16 @@ class lavaRunner {
     }
 
     update() {
-        this.countDown -= .02;
+        this.countDown -= .015;
         if(this.countDown > 0) {
             this.drawCountDown();
         } else if (!this.gameOver) {
             this.runner.active = true;
 
-            this.lava += 1.2 + (this.runner.x - this.lava - 10)/100;
-            if(this.runner.x < this.lava) {
+            this.lavaV = 1.3 + (this.runner.x - this.lavaX) / 100;
+            this.lavaX += this.lavaV;
+
+            if(this.runner.x < this.lavaX) {
                 this.runner.active = false;
                 this.gameOver = true;
                 this.runner.state = "still";
@@ -82,16 +85,22 @@ class lavaRunner {
             if(this.runner.x > canvas.width - 100) {
                 this.runner.active = false;
                 this.gameOver = true;
-                gameRunner.runner.update("left");
+                this.runner.state = "left";
                 gameRunner.runner.update("right");
+                gameRunner.runner.update("left");
                 this.runner.state = "won";
             }
         } else {
             if(this.runner.state == "won") {
-                this.lava -= 1.2;
+                this.lavaV *= .95;
             } else {
-                this.lava += 6;
+                if(this.lavaX < canvas.width * 2) {
+                    this.lavaV *= 1.05;
+                } else {
+                    this.lavaV = 0;
+                }
             }
+            this.lavaX += this.lavaV;
         }
     }
 
@@ -104,8 +113,8 @@ class lavaRunner {
         c.beginPath();
         c.moveTo(0, 0);
         c.lineTo(0, canvas.height);
-        c.lineTo(this.lava + 150, canvas.height);
-        c.lineTo(this.lava - 150, 0);
+        c.lineTo(this.lavaX + 150, canvas.height);
+        c.lineTo(this.lavaX - 150, 0);
         c.lineTo(0, 0);
         c.closePath();
         c.fill();
@@ -114,11 +123,22 @@ class lavaRunner {
             c.fillStyle = "white";
             c.font = "20px Courier New";
             c.fillText("damn you really died", canvas.width/2, canvas.height/2);
+        } else if (this.runner.state == "won") {
+            c.fillStyle = "white";
+            c.font = "20px Courier New";
+            c.fillText("good shit man", canvas.width/2, canvas.height/2);
         }
     }
 
     drawCountDown() {
-        let opacity = this.countDown - Math.floor(this.countDown) + .4;
+        let opacity = this.countDown + .4;
+        c.fillStyle = "rgba(255, 255, 255, "+(opacity*opacity)+")";
+        c.textAlign = "center";
+        c.textBaseline = "middle";
+        c.font = "20px Courier New";
+        c.fillText("use left and right arrows to take steps, avoid the lava", canvas.width/2, canvas.height/4);
+
+        opacity = this.countDown - Math.floor(this.countDown) + .4;
         c.fillStyle = "rgba(255, 255, 255, "+(opacity*opacity)+")";
         c.font = "120px Courier New";
         c.fillText(Math.ceil(this.countDown), canvas.width/2, canvas.height/2);
@@ -149,11 +169,6 @@ function gameLoop() {
     c.clearRect(0, 0, canvas.width, canvas.height);
     c.fillStyle = "#FF8E72";
     c.fillRect(0, 0, canvas.width, canvas.height);
-    c.fillStyle = "#fff";
-    c.textAlign = "center";
-    c.textBaseline = "middle";
-    c.font = "20px Courier New";
-    c.fillText("use left and right arrows to take steps, avoid the lava", canvas.width/2, canvas.height/4);
 
     gameRunner.update();
     gameRunner.draw();
