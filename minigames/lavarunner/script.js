@@ -1,20 +1,22 @@
 let canvas = document.getElementById("paper");
 let c = canvas.getContext("2d");
+c.imageSmoothingEnabled = false;
+c.mozImageSmoothingEnabled = false;
 
 class Runner {
     constructor() {
         this.x = 60;
-        this.y = canvas.height/2 - 20;
+        this.y = canvas.height/2 - 30;
         this.state = "still";
         this.active = false;
 
-        let spriteLeft = new Image(40, 40);
+        let spriteLeft = new Image(60, 60);
         spriteLeft.src = "assets/runningmanleft.png";
-        let spriteRight = new Image(40, 40);
+        let spriteRight = new Image(60, 60);
         spriteRight.src = "assets/runningmanright.png";
-        let spriteStill = new Image(40, 40);
+        let spriteStill = new Image(60, 60);
         spriteStill.src = "assets/runningmanstill.png";
-        let spriteWon = new Image(40, 40);
+        let spriteWon = new Image(80, 80);
         spriteWon.src = "assets/runningmanwon.png";
 
         this.sprite = {
@@ -46,7 +48,7 @@ class Runner {
                 c.drawImage(this.sprite.still, this.x, this.y, this.sprite.still.width, this.sprite.still.height);
                 break;
             case "won":
-                c.drawImage(this.sprite.won, this.x, this.y, this.sprite.still.width, this.sprite.still.height);
+                c.drawImage(this.sprite.won, this.x, this.y, this.sprite.won.width, this.sprite.won.height);
                 break;
             default:
                 console.log("state not found")
@@ -74,7 +76,7 @@ class lavaRunner {
         } else if (!this.gameOver) {
             this.runner.active = true;
 
-            this.lavaV = 1.3 + (this.runner.x - this.lavaX) / 100;
+            this.lavaV = 1.4 + (this.runner.x - this.lavaX) / 100;
             this.lavaX += this.lavaV;
 
             if(this.runner.x < this.lavaX) {
@@ -87,7 +89,6 @@ class lavaRunner {
                 this.gameOver = true;
                 this.runner.state = "left";
                 gameRunner.runner.update("right");
-                gameRunner.runner.update("left");
                 this.runner.state = "won";
             }
         } else {

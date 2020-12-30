@@ -1,5 +1,7 @@
 let canvas = document.getElementById("paper");
 let c = canvas.getContext("2d");
+c.imageSmoothingEnabled = false;
+c.mozImageSmoothingEnabled = false;
 
 class Mouse {
     x = 0;
@@ -49,6 +51,8 @@ class GameObject {
 
     draw() {
         if(this.visible) {
+            c.fillStyle = "#dffaf3";
+            c.fillRect(this.x, this.y, this.sprite.width, this.sprite.height-5);
             c.drawImage(this.sprite, this.x, this.y, this.sprite.width, this.sprite.height);
         }
     }
@@ -61,23 +65,24 @@ class GameObject {
 
 class CupSwapper {
     constructor() {
-        let cupSprite = new Image(445/4, 428/4);
+        let cupSprite = new Image(100, 120);
         cupSprite.src = "assets/cup.png";
         this.cups = [new GameObject(cupSprite, canvas.width * 1/4 - cupSprite.width/2, canvas.height/2 - cupSprite.height/2 - 200, false),
                       new GameObject(cupSprite, canvas.width * 2/4 - cupSprite.width/2, canvas.height/2 - cupSprite.height/2 - 200, false),
                       new GameObject(cupSprite, canvas.width * 3/4 - cupSprite.width/2, canvas.height/2 - cupSprite.height/2 - 200, false)];
         
         this.swaps = 30;
-        this.speed = 1;
+        this.speed = 3;
         this.curAngle = 0;
 
-        let tireSprite = new Image(445/4, 428/4);
+        let tireSprite = new Image(80, 80);
         tireSprite.src = "assets/tire.png";
         this.tire = new GameObject(tireSprite, canvas.width * 2/4 - tireSprite.width/2, canvas.height/2 - tireSprite.height/2, false);
 
         const idx = Math.floor(Math.random() * this.cups.length);
         this.activeCups = [idx, (idx + 1) % this.cups.length];
-        this.introFrames = 200;
+        this.introFrames = 100;
+        this.endFrames = 100;
         this.gameOver = false;
         this.direction = Math.sign(Math.random() - .5);
     }
@@ -85,7 +90,7 @@ class CupSwapper {
     update() {
         if(this.introFrames > 0) {
             for(let cup of this.cups) {
-                cup.y++;
+                cup.y += 2;
             }
             this.introFrames--;
             if(this.introFrames <= 0) {
@@ -106,8 +111,8 @@ class CupSwapper {
                     this.activeCups = [idx, (idx + 1) % this.cups.length];
 
                     if(this.swaps <= 0) {
-                        this.tire.x = this.cups[1].x;
-                        this.tire.y = this.cups[1].y;
+                        this.tire.x = this.cups[1].x + (this.cups[1].sprite.width - this.tire.sprite.width)/2;
+                        this.tire.y = this.cups[1].y + (this.cups[1].sprite.width - this.tire.sprite.width)/2;
                         this.tire.visible = true
                         this.cups[0].clickable = true;
                         this.cups[1].clickable = true;
@@ -122,15 +127,19 @@ class CupSwapper {
                             cup.clickable = false;
                         }
                         this.gameOver = true;
-                        cup.visible = false;
                     }
                 }
-            } else {    
-                if(this.gameOver) {
+            } else {
+                if(this.gameOver && this.endFrames > 0) {
                     for(let cup of this.cups) {
-                        cup.y--;
+                        if(cup.active) {
+                            cup.y -= 1.5;
+                        } else if(this.endFrames < 70) {
+                            cup.y -= 1.5;
+                        }
                     }
                 }
+                this.endFrames--;
             }
         }
     }
