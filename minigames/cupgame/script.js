@@ -105,7 +105,7 @@ class CupSwapper {
                 } else {
                     this.swaps -= 1;
                     this.curAngle = 0;
-                    this.speed = (Math.abs(this.speed) + .5);
+                    this.speed = (Math.abs(this.speed) + .3);
                     this.direction = Math.sign(Math.random() - .5);
                     const idx = Math.floor(Math.random() * this.cups.length);
                     this.activeCups = [idx, (idx + 1) % this.cups.length];
@@ -172,14 +172,11 @@ canvas.addEventListener("mousemove", updatePos);
 canvas.addEventListener("mousedown", updateState);
 canvas.addEventListener("mouseup", updateState);
 
-function gameLoop() {
+setInterval(function() {
     c.clearRect(0, 0, canvas.width, canvas.height);
     c.fillStyle = "#dffaf3";
     c.fillRect(0, 0, canvas.width, canvas.height);
 
     gameRunner.update();
     gameRunner.draw();
-
-    requestAnimationFrame(gameLoop);
-}
-requestAnimationFrame(gameLoop);
+}, 15);

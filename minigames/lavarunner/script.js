@@ -166,14 +166,11 @@ document.addEventListener("keydown", function(e) {
     }
 });
 
-function gameLoop() {
+setInterval(function() {
     c.clearRect(0, 0, canvas.width, canvas.height);
     c.fillStyle = "#FF8E72";
     c.fillRect(0, 0, canvas.width, canvas.height);
 
     gameRunner.update();
     gameRunner.draw();
-
-    requestAnimationFrame(gameLoop);
-}
-requestAnimationFrame(gameLoop);
+}, 15);

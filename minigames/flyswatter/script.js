@@ -250,14 +250,11 @@ class FlyRunner {
 
 let gameRunner = new FlyRunner();
 
-function gameLoop() {
+setInterval(function() {
     c.clearRect(0, 0, canvas.width, canvas.height);
     c.fillStyle = "#F0CF85";
     c.fillRect(0, 0, canvas.width, canvas.height);
 
     gameRunner.update();
     gameRunner.draw();
-
-    requestAnimationFrame(gameLoop);
-}
-requestAnimationFrame(gameLoop);
+}, 15);
