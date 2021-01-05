@@ -45,26 +45,22 @@ class Drop {
     constructor(x, y, hue) {
         this.x = x;
         this.y = y;
-        this.vy = 3;
+        this.vBottom = 3;
+        this.vExit = 3;
         this.spawnY = y;
         this.hue = hue;
         this.dripping = true;
         this.length = 0;
-        this.volume = 0;
     }
 
     update() {
-        this.vy += .2;
+        this.vExit += .2;
         if(!this.dripping) {
-            this.vy += .2;
-            this.y += this.vy; 
-        }
-    }
-    
-    lengthen() {
-        if(this.dripping) {
-            this.length += this.vy;
-            this.volume = this.length + 10;
+            this.vExit += .2;
+            this.y += this.vExit;
+        } else {
+            this.vBottom += .1;
+            this.length += this.vBottom;
         }
     }
 
@@ -104,10 +100,6 @@ class Dropper {
 
     update() {
         this.updateButton();
-
-        if(this.button.down) {
-            this.drops[this.drops.length - 1].lengthen();
-        }
 
         for(let drop of this.drops) {
             drop.update();
@@ -270,7 +262,7 @@ class fuelMixer {
                 this.bucket.rightHueAmt += lastLength - Math.max(drop.length, 0);
             }
 
-            if(drop.y > this.bucket.realBottom - this.bucket.level) {
+            if(drop.length < 0) {
                 this.dropper.right.drops.splice(index, 1);
             }
         }
