@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<script defer src="/__/firebase/8.2.1/firebase-app.js"></script>
+	<base href="https://f1-databas.firebaseapp.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,400;1,700&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400&display=swap" rel="stylesheet">
 	<link rel = "stylesheet" href="css/homeStyles.css">
-    <title>Formula Fun</title>
+    <script defer src="/__/firebase/8.2.1/firebase-auth.js"></script>
+    <script defer src="/__/firebase/8.2.1/firebase-database.js"></script>
+	<!-- <script defer src="/__/firebase/init.js?useEmulator=true"></script> -->
+	<script defer src="/__/firebase/init.js"></script>
+	<title>Formula Fun</title>
 </head>
+
 <body>
+  <script src="app.js"></script>
+
 	<!--<canvas id="canvas" width="1000px" height="1000px"></canvas>
 	<script type="text/javascript" src="main.js"></script>-->
 	<div class="header">
@@ -26,6 +35,78 @@
 			 </ul>
 			</nav>
 		</div>
+
+	<!-- Drop down menu, need to improve and apply to other pages -->
+	<svg  width="120" height="120" class="drop">
+		<a href="#" class="dropbtn">
+			<path d="M   0   0
+				L 120   0
+				L 120 30
+				L  60  40
+				L 60 40
+				L   0 30
+				Z"
+				fill="#E0CB41"/>
+		  	<text x="60"
+				y="20"
+				fill="black"
+				text-anchor="middle"
+				alignment-baseline="middle">
+				Options
+		  		</text>
+		  	<div id="dropdown" class="dropdown-content">
+				<a href="#" onclick="googleLogin()">Login</a>
+				<a href="#">Something</a>
+				<a href="#">Settings</a>
+			</div>
+		</>
+	</svg>
+		  <!-- Drop down menu script, still in need of improvement!
+		  My main idea is to show the dropdown menu gradually as
+		  the options button descends. If anyone wants to take a crack at it,
+		  by my guest! You'll likely need to use the below script as well.
+
+		  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		    $(document).ready(function(){
+		    $(".dropbtn").click(function(){
+		    $(".dropdown-content").slideToggle('slow');
+		    });
+		  }); -->
+		  <script>
+		  let drop = document.querySelector('.drop')
+		  let dropdownBtn = document.querySelector('.dropbtn');
+		  let menuContent = document.querySelector('.dropdown-content');
+
+			dropdownBtn.addEventListener('click',() => {
+			    if(menuContent.style.display==="") {
+			        var i = 0;
+			        function dropLoop() {
+				        setTimeout(function() {
+				          i++;
+				          if (i <= 200) {
+				            if (i == 200) menuContent.style.display="block";
+				            drop.style.top = i;
+				            dropLoop();
+				          }
+					  }, .5)
+				      }
+				      dropLoop()
+			    } else {
+			        var i = 140;
+				    function dropLoop2() {
+				    setTimeout(function() {
+				        i--;
+				        if (i >= 0) {
+				            drop.style.top = i;
+				            dropLoop2();
+				          }
+				        }, 1)
+				      }
+				      dropLoop2();
+				      menuContent.style.display="";
+				   }
+			   });
+		   </script>
 
 		<!-- stats section -->
 		<div class="stats">
