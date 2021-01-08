@@ -12,10 +12,11 @@ class Car {
         this.vx = 0;
         this.vy = 0;
         this.speed = 0;
+        this.alive = true;
         
         this.width = 60;
         this.height = 30;        
-        
+
         this.corners = [];
         this.findCorners();
     }
@@ -37,18 +38,22 @@ class Car {
     }
 
     update(key) {
-        const realSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if(this.alive) {
+            const realSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
 
-        if(key.left && !key.right) {
-            this.d -= Math.min(.02 * realSpeed, .07);
-        } else if(key.right && !key.left) {
-            this.d += Math.min(.02 * realSpeed, .07);
-        }
+            if(key.left && !key.right) {
+                this.d -= Math.min(.02 * realSpeed, .07);
+            } else if(key.right && !key.left) {
+                this.d += Math.min(.02 * realSpeed, .07);
+            }
 
-        if(key.up && !key.down && this.speed < 1.5) {
-            this.speed += .4;
-        } else if(key.down && !key.up && this.speed > -1.5) {
-            this.speed -= .4;
+            if(key.up && !key.down && this.speed < 1.5) {
+                this.speed += .4;
+            } else if(key.down && !key.up && this.speed > -1.5) {
+                this.speed -= .4;
+            } else {
+                this.speed *= .8;
+            }
         } else {
             this.speed *= .8;
         }
@@ -118,15 +123,6 @@ class Car {
         c.fillRect(-this.width/2, -this.height/2, this.width, this.height);
         c.rotate(-this.d);
         c.translate(-this.x, -this.y);
-
-        c.fillStyle = "blue";
-        c.fillRect(this.corners[0][0] - 2, this.corners[0][1] - 2, 4, 4);
-        c.fillStyle = "pink";
-        c.fillRect(this.corners[1][0] - 2, this.corners[1][1] - 2, 4, 4);
-        c.fillStyle = "orange";
-        c.fillRect(this.corners[2][0] - 2, this.corners[2][1] - 2, 4, 4);
-        c.fillStyle = "green";
-        c.fillRect(this.corners[3][0] - 2, this.corners[3][1] - 2, 4, 4);
     }
 }
 
@@ -218,44 +214,29 @@ class FrogHandler {
         this.scrollSpeed = 0;
 
         this.offset = 0;
+        this.nextLayer = 0;
     }
 
-    spawnFrogs() {
-        let fy = -this.offset - (canvas.height / 4 + Math.random() * canvas.height);
+    spawnFrogLayer() {
+        let fy = -this.offset - 100;
+
         fy = Math.floor(fy / 100) * 100;
-        
         let fdir = Math.sign(Math.random() - .5);
-        let fjumpTimer = 70;
-        let fvx = 0;
-        let fx = null;
-        
-        if(fy + Frog.height > -this.offset) {
-            fx = canvas.width/2 - (fdir * (canvas.width/2 + Frog.width)) - Frog.width/2;
-        } else {
-            fx = canvas.width/2 - Math.random() * (fdir * (canvas.width/2 + Frog.width)) - Frog.width/2;
-        }
 
-        fx = Math.floor(fx / 100) * 100;
-        
-        let collision = true;
-        while(collision) {
-            collision = false;
+        let count = 0;
+
+        for(let i = 1; i < canvas.width / 100; i++) {
+            if(Math.random() > .3) continue;
+            if(count > 4) break;
             
-            for(const frog of this.frogs.reverse()) {
-                if(frog.y == fy) { 
-                    if(frog.x + Frog.width > fx && frog.x < fx + Frog.width) {
-                        fx -= fdir * 100;
-                        collision = true;
-                    }
+            let fx = 100 * i * fdir;
+            let fjumpTimer = 70 - i * 10;
+            let fvx = 0;
+            
+            this.frogs.push(new Frog(fx, fy, fdir, fjumpTimer, fvx));
 
-                    fdir = frog.dir;
-                    fjumpTimer = frog.jumpTimer;
-                    fvx = frog.vx;
-                }
-            }
+            count++
         }
-
-        this.frogs.push(new Frog(fx, fy, fdir, fjumpTimer, fvx));
     }
 
     update() {
@@ -289,15 +270,13 @@ class FrogHandler {
             if(collision) {
                 this.gameOver = true;
                 this.isWon = false;
+                this.car.alive = false
             }
         }
 
-        if(this.frogs.length < this.frogAmt) {
-            this.spawnFrogs();
-        }
-
-        if(this.frogAmt < 15) {
-            this.frogAmt += .01;
+        if(this.offset > this.nextLayer) {
+            this.spawnFrogLayer();
+            this.nextLayer += Math.floor(Math.random()*1.1 + 1) * 100;
         }
 
         this.road.update();
@@ -306,8 +285,10 @@ class FrogHandler {
             if(this.car.update(this.key) > -this.offset + canvas.height) {
                 this.gameOver = true;
                 this.isWon = false;
+                this.car.alive = false
             }
         } else {
+            this.car.update(this.key)
             this.scrollSpeed *= .9;
         }
     }
@@ -322,8 +303,22 @@ class FrogHandler {
         for(const frog of this.frogs) {
             frog.draw();
         }
-        
+
         c.translate(0, -this.offset);
+        
+        c.globalCompositeOperation = "difference";
+        if(this.gameOver) { 
+            c.fillStyle = "white";
+            c.textAlign = "center";
+            c.textBaseline = "middle";
+            c.font = "20px Courier New";
+            if(this.isWon) {
+                c.fillText("wow, nice!", canvas.width/2, canvas.height/2);
+            } else {
+                c.fillText("the frogs gotcha dude", canvas.width/2, canvas.height/2);
+            }
+        }
+        c.globalCompositeOperation = "source-over";
     }
 }
 

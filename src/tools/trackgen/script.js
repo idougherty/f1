@@ -85,7 +85,7 @@ class Track {
         this.width = 15;
         this.center = new Point(canvas.width/2, canvas.height/2);
         
-        this.seedPoints = this.generateSeedPoints(10);
+        this.seedPoints = this.generateSeedPoints(20);
         this.generateTrack();
     }
 
@@ -169,9 +169,9 @@ class Track {
         points = points.map(x => x[0]);
 
         //warp points
-        points = Track.perlinIterate(points, 100, 2, .001);
+        points = Track.perlinIterate(points, 10, 20, .001);
         points = Track.perlinIterate(points, 10, 4, .01);
-        // points = this.perlinIterate(points, 1, 20, .1);
+        points = Track.perlinIterate(points, 10, 1, .1);
 
         //apply separation forces
         let separated = false;
@@ -192,7 +192,7 @@ class Track {
         // points = Track.resolvePinches(points);
 
         //straighten edges
-        points = Track.straightenEdges(points);
+        points = Track.cleanTrack(points);
 
         //recenter points
         let offset = Track.getCenter(points);
@@ -204,7 +204,7 @@ class Track {
         return points;
     }
 
-    static straightenEdges(points) {
+    static cleanTrack(points) {
         let straight = false;
 
         while(!straight) {
@@ -214,8 +214,9 @@ class Track {
                 const p1 = points[mod(i - 1, points.length)];
                 const p2 = points[mod(i + 1, points.length)];
                 
-                if(Math.abs(getAngle(vertex, p1, p2)) > Math.PI * .9) {
-                    console.log("straightened");
+                const theta = Math.abs(getAngle(vertex, p1, p2));
+
+                if(theta > Math.PI * .9 || theta < .8) {
                     points.splice(i, 1);
                     straight = false;
                 }
@@ -224,46 +225,6 @@ class Track {
 
         return points;
     }
-
-    // static resolvePinches(points) {
-        // let pinching = true;
-
-        // while(pinching) {
-        //     pinching = false;
-
-            // let depth = 0;
-            // for(let i = 0; i < points.length; i++) {
-            //     depth++;
-
-            //     const vertex = points[i];
-            //     const p1 = points[mod(i - 1, points.length)];
-            //     const p2 = points[mod(i + 1, points.length)];
-                
-            //     if(Math.abs(getAngle(vertex, p1, p2)) < .8) {
-            //         console.log("pinch!");
-            //         // pinching = true;
-
-            //         const d1 = Point.distance(p1, vertex);
-            //         const d2 = Point.distance(p2, vertex);
-            //         const further = d1 > d2 ? p1 : p2;
-
-            //         const theta = Math.atan2(further.y - vertex.y, further.x - vertex.x);
-            //         const turn = p1 == further ? Math.PI/6 : -Math.PI/6;
-            //         const spacing = Math.max(d1, d2);
-
-            //         const nx = Math.cos(theta + turn) * spacing + vertex.x;
-            //         const ny = Math.sin(theta + turn) * spacing + vertex.y;
-            //         points.splice(i, 1, new Point(nx, ny));
-            //     }
-
-            //     if(depth > 50) {
-            //         break;
-            //     }
-            // }
-        // }
-
-    //     return points;
-    // }
 
     static getCenter(points) {
         let center = new Point(0, 0);
