@@ -37,6 +37,38 @@ canvas.addEventListener("mousemove", updatePos);
 canvas.addEventListener("mousedown", updateState);
 canvas.addEventListener("mouseup", updateState);
 
+class Particle {
+    constructor(x1, y1, x2, y2) {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
+        this.vx = 0;
+        this.vy = 0;
+        this.size = 3;
+        this.color = "#323031";
+    }
+
+    update() {
+        this.size -= .1;
+
+        return this.size < 0;
+    }
+
+    draw() {
+        c.globalAlpha = this.size;
+        c.strokeStyle = this.color;
+        c.lineWidth = 4;
+        c.beginPath()
+        c.moveTo(this.x1, this.y1);
+        c.lineTo(this.x2, this.y2);
+        c.closePath();
+        c.stroke();
+        // c.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+        c.globalAlpha = 1;
+    }
+}
+
 class Decal {
     constructor(src, x, y, scale = 1) {
         let sprite = new Image();
@@ -74,6 +106,7 @@ class Fly {
         this.vy = 0;
         this.timer = 0;
         this.alive = true;
+        this.particles = [];
 
         let flySpriteAlive = new Image(30, 30);
         flySpriteAlive.src = "assets/fly.png";
@@ -96,6 +129,7 @@ class Fly {
                 this.timer = Math.random() * 10 + 5;
             }
             
+            this.newParticle();
             this.collision();
         } else {
             this.vy += .6;
@@ -103,6 +137,37 @@ class Fly {
             this.vy *= .97;
         }
         
+        for(const [index, particle] of this.particles.entries()) {
+            if(particle.update()) {
+                this.particles.splice(index, 1);
+            }
+        }
+    }
+
+    newParticleTest(particle) {
+        if(!this.alive) return false;
+
+        const dx = this.x + this.sprite.width/2 - particle.x2;
+        const dy = this.y + this.sprite.height/2 - particle.y2;
+        const dist2 = dx*dx + dy*dy;
+        const distMin = 10;
+
+        return dist2 > distMin*distMin;
+    }
+
+    newParticle() {
+        if(this.particles.length == 0 || this.newParticleTest(this.particles[this.particles.length - 1])) {
+            const x1 = this.x + this.sprite.width/2;
+            const y1 = this.y + this.sprite.height/2;
+
+            const dx = this.vx / Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+            const dy = this.vy / Math.sqrt(this.vx*this.vx + this.vy*this.vy);
+
+            const x2 = x1 + dx*5;
+            const y2 = y1 + dy*5;
+
+            this.particles.push(new Particle(x1, y1, x2, y2));
+        }
     }
 
     collision() {
@@ -130,12 +195,16 @@ class Fly {
         } else {
             c.drawImage(this.spriteDead, this.x, this.y, this.spriteDead.width, this.spriteDead.height);
         }
+
+        for(const particle of this.particles) {
+            particle.draw();
+        }
     }
 
     die() {
         this.alive = false;
         this.vx *= .5;
-        this.vy = -2;
+        this.vy = -5;
     }
 }
 
@@ -217,7 +286,7 @@ class FlyRunner {
                 const decalScale = Math.random()*.1 + .1;
                 this.decals.push(new Decal("assets/blood.png", decalX, decalY, decalScale));
             }
-
+            
             if(this.flies[i].y > canvas.height) {
                 this.flies.splice(i, 1);
             }
@@ -230,10 +299,10 @@ class FlyRunner {
     }
     
     draw() {
-        for(let decal of this.decals) {
+        for(const decal of this.decals) {
             decal.draw();
         }
-        for(let fly of this.flies) {
+        for(const fly of this.flies) {
             fly.draw();
         }
         if(!this.gameOver) {

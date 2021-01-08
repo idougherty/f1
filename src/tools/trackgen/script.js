@@ -173,6 +173,13 @@ class Track {
         points = Track.perlinIterate(points, 10, 4, .01);
         points = Track.perlinIterate(points, 10, 1, .1);
 
+        //recenter points
+        let offset = Track.getCenter(points);
+        for(const point of points) {
+            point.x += this.center.x - offset.x;
+            point.y += this.center.y - offset.y;
+        }
+
         //apply separation forces
         let separated = false;
         while(!separated) {
@@ -187,19 +194,9 @@ class Track {
                 }
             }
         }
-        
-        //check and fix pinch points
-        // points = Track.resolvePinches(points);
 
         //straighten edges
         points = Track.cleanTrack(points);
-
-        //recenter points
-        let offset = Track.getCenter(points);
-        for(const point of points) {
-            point.x += this.center.x - offset.x;
-            point.y += this.center.y - offset.y;
-        }
         
         return points;
     }
@@ -280,9 +277,11 @@ class Track {
 		if(neighbors == 0) return new Point(0, 0);
 		 
 		xForce /= neighbors;	
-		yForce /= neighbors;
+        yForce /= neighbors;
+        
+        const vector = this.normalize(xForce, yForce);
+        
 
-		const vector = this.normalize(xForce, yForce);
 
 		return new Point(vector[0], vector[1]);
 	}
