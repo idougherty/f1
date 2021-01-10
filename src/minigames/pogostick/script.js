@@ -14,7 +14,7 @@ class PogoDude {
         this.dx = 0;
         this.dy = 0;
         this.drot = 0;
-        this.rotation = 0; // in degrees: 0 is up, - is left, + is right
+        this.rotation = 0; // in degrees: 0 is up, - is left, + is right, -180 == 180 == down
         this.in_air = false;
         this.sprite = new Image(12, 48);
         this.sprite.src = "assets/placeholder_pogo_man.png";
@@ -156,8 +156,12 @@ class Obstacle {
 
 class Game {
     constructor() {
-        this.running = false;
-        this.pogo_dude = new PogoDude(canvas.width/2, canvas.height/2);
+        this.restart();
+    }
+
+    restart() {
+        this.running = true;
+        this.pogo_dude = new PogoDude(SCREEN_DIMS.width/2, SCREEN_DIMS.height/2);
 
         this.obstacles = [];
         this.obstacles.push(new Obstacle(200, 300, 300, 30));
@@ -187,6 +191,10 @@ class Game {
         }
 
         this.pogo_dude.update(this.input, collision, dt);
+
+        if (!this.running) {
+            this.restart();
+        }
     }
 
     draw() {
