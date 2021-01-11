@@ -78,33 +78,55 @@ class brakes extends part {
 
 class engine extends part {
 	break() {
-		car.frame.damage(damFactor);
-		car.suspension.damage(damFactor);
-		car.brakes.damage(damFactor);
-		car.transmission.damage(damFactor);
-		car.nose.damage(damFactor);
-		car.side.damage(damFactor);
-		car.wing.damage(damFactor);
-		car.tires.damage(damFactor);
+		this.car.frame.damage(damFactor);
+		this.car.suspension.damage(damFactor);
+		this.car.brakes.damage(damFactor);
+		this.car.transmission.damage(damFactor);
+		this.car.nose.damage(damFactor);
+		this.car.side.damage(damFactor);
+		this.car.wing.damage(damFactor);
+		this.car.tires.damage(damFactor);
 		if (math.random() < damFactor/size) {
 			//player fucking dies
 		}
 	}
 	segment() {
-		car.fuel.damage(efficiency);
+		this.car.fuel.damage(efficiency);
 	}
-	constructor(s, w, dm, d, car, c, df, e, mr, h, complex) {
+	constructor(s, w, dm, d, car, c, df, e, mr, h, complex, fA) {
 		this.damFactor = df;
 		this.efficiency = e;
 		this.maxRev = mr;
 		this.hrp = h;
 		this.complex = complex;
+		this.fuelTypes = fA; //array of allowed fuel types
 		super(s, w, dm, d, car, c);
 	}
 }
 
 class fuel extends part {
-	constructor(s, w, dm, d, car, c) {
+	damage (d) {
+		let engDam = true;
+		if (d > curStrength) {
+			this.break();
+		}
+		for(let i = 0; i < this.car.eng.fuelTypes.length; i++){
+			if(this.car.eng.fuelTypes[i] === this.type){
+				engDam = false; 
+			}
+		}
+		if(engDam){
+			this.car.eng.damage(10);
+		}
+		curStrength -= d * dModifier;
+	}
+
+	segment(){
+		this.curWeight = (this.curStrength/this.strength)*this.weight;
+	}
+	constructor(s, w, dm, d, car, c, t, q) {
+		this.quality = q;
+		this.type = t;
 		super(s, w, dm, d, car, c);
 	}
 }
@@ -114,17 +136,28 @@ class aero extends part {
 		broken = true;
 		drag = car.frame.size;
 		this.downF = 1;
+		this.curWeight = 0;
+		this.size = 0;
 	}
-	constructor(s, w, dm, d, car, c, drag, df) {
+	constructor(s, w, dm, d, car, c, drag, df, size) {
 		this.drag = drag;
 		this.downF = df;
+		this.size = size;
 		super(s, w, dm, d, car, c);
 	}
 }
 
 class tire extends part {
+	damage(d){
+		if (d > curStrength) {
+			this.break();
+		}
+		curStrength -= d * dModifier;
+		curQual = (this.curStrength/this.strength)*this.quality;
+	}
 	constructor(s, w, dm, d, car, c, q) {
 		this.quality = q;
+		this.curQual = this.quality;
 		super(s, w, dm, d, car, c);
 	}
 }

@@ -287,57 +287,23 @@ class Track {
 	}
 
     draw() {
-        c.strokeStyle = "#444";
+        c.strokeStyle = "#080F0F";
         c.lineWidth = this.width;
 
         c.beginPath();
         let h = 0;
         for(const part of this.parts) {
             h += 360 / this.parts.length
-            c.strokeStyle = "hsl("+h+", 30%, 40%)";
+            c.strokeStyle = "hsl("+h+", 50%, 50%)";
             c.beginPath();
             part.draw();
-            // c.closePath();
             c.stroke();
         }
-        
-        for (const point of this.seedPoints) {
-            point.draw();
-            // c.lineTo(point.x, point.y);
-            
-        }
-        // c.closePath();
-        // c.stroke();
     }
 }
 
 track = new Track();
 
-// track.draw();
-function v1() {
-    c.fillStyle = "#9999cc";
-    c.fillRect(0, 0, canvas.width, canvas.height);
-    c.lineWidth = 15;
-    
-    let h = 0;
-    for(const part of track.parts) {
-        h += 360 / track.parts.length
-        c.strokeStyle = "hsl("+h+", 30%, 40%)";
-        c.beginPath();
-        part.draw();
-        c.stroke();
-    }
-}
-
-function v2() {
-    c.fillStyle = "#9999cc";
-    c.fillRect(0, 0, canvas.width, canvas.height);
-    c.lineWidth = 15;
-
-    for (const point of track.seedPoints) {
-        c.strokeStyle = "#333";
-        point.draw();
-    }
-}
-
-v1();
+c.fillStyle = "#080F0F";
+c.fillRect(0, 0, canvas.width, canvas.height);
+track.draw();

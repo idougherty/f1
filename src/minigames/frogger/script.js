@@ -14,8 +14,8 @@ class Car {
         this.speed = 0;
         this.alive = true;
         
-        this.width = 60;
-        this.height = 30;        
+        this.width = 64;
+        this.height = 32;        
 
         this.corners = [];
         this.findCorners();
@@ -160,8 +160,13 @@ class Frog {
         this.vx = vx;
 
         let sprite = new Image(Frog.width, Frog.height);
-        sprite.src = "assets/road.png";
+        sprite.src = "assets/frog.png";
         this.sprite = sprite;
+        
+        let sprite2 = new Image(Frog.width * 2, Frog.height);
+        sprite2.src = "assets/frogjumping.png";
+        console.log(sprite2.width, sprite2.height);
+        this.sprite2 = sprite2;
     }
 
     static pointCollide(frog, point) {
@@ -191,8 +196,13 @@ class Frog {
     }
 
     draw() {
-        c.fillStyle = "green";
-        c.fillRect(this.x, this.y, this.sprite.width, this.sprite.height);
+        if(Math.abs(this.vx) < 1) {
+            c.drawImage(this.sprite, this.x, this.y, this.sprite.width, this.sprite.height);
+        } else {
+            c.drawImage(this.sprite2, this.x, this.y, this.sprite.width, this.sprite.height);
+        }
+        // c.fillStyle = "green";
+        // c.fillRect(this.x, this.y, this.sprite.width, this.sprite.height);
     }
 }
 
