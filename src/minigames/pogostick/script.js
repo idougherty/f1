@@ -181,6 +181,7 @@ class Game {
         this.obstacles.push(new Obstacle(50, 0, 100, 300));
         this.obstacles.push(new Obstacle(500, 100, 300, 20));
         this.obstacles.push(new Obstacle(500, 100, 300, 20));
+        this.obstacles.push(new Obstacle(800, 50, 100, 250));
 
         this.input = {
             left: false,
