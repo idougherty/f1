@@ -92,7 +92,7 @@ class Stats{
         return p;
     }
     zodiac(){
-        this.sign = "";
+        let sign = "";
         let x = Math.floor(Math.random() * 12);
         switch (x) {
             case 0:
@@ -155,15 +155,15 @@ class Stats{
         this.social = Math.floor(Math.random()*2);
         this.agression = Math.random()*100;
         this.self =  Math.random()*100;
-        this.hieght = randn_bm(22,69,107,15);
+        this.height = randn_bm(22,69,107,15);
         this.weight = random(50,300);
-        this.bmi = this.weight/Math.pow(this.hieght,2);
+        this.bmi = this.weight/Math.pow(this.height,2);
         this.toler = Math.random()*100;
         this.los = randn_bm(1,50,100,5);
         this.loyal = Math.random()*100;
         this.moral = Math.random()*100;
         this.pubP = 50;
-        this.sign = this.zodiac;
+        this.sign = this.zodiac();
         this.accel = [this.dExp, this.ambition, this.risk, this.sex, this.los];
         this.deccel = [this.neck, this.intel, this.percept, this.dExp, this.plat, this.los];
         this.corn = [this.neck, 100-this.tired, this.intel, this.percept, this.dExp, this.creative, this.plat, this.self, this.los];
