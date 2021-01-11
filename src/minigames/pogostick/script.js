@@ -164,6 +164,13 @@ class WinBlock extends Obstacle {
     }
 }
 
+var hard_level = [  new Obstacle(200, 300, 300, 30),
+                    new Obstacle(400, 100, 100, 200),
+                    new Obstacle(50, 0, 100, 300),
+                    new Obstacle(500, 100, 300, 20),
+                    new Obstacle(500, 100, 300, 20),
+                    new Obstacle(800, 50, 100, 250)];
+
 class Game {
     constructor() {
         this.restart();
@@ -173,15 +180,12 @@ class Game {
         this.run_state = "running";
         this.pogo_dude = new PogoDude(canvas.width/2, canvas.height/2);
 
-        this.win_block = new WinBlock(800, 0, 100, 50);
+        this.win_block = new WinBlock(1200, 300, 200, 30);
 
-        this.obstacles = [];
-        this.obstacles.push(new Obstacle(200, 300, 300, 30));
-        this.obstacles.push(new Obstacle(400, 100, 100, 200));
-        this.obstacles.push(new Obstacle(50, 0, 100, 300));
-        this.obstacles.push(new Obstacle(500, 100, 300, 20));
-        this.obstacles.push(new Obstacle(500, 100, 300, 20));
-        this.obstacles.push(new Obstacle(800, 50, 100, 250));
+        this.obstacles = [  new Obstacle(200, 300, 1000, 30),
+                            new Obstacle(500, 250, 50, 50),
+                            new Obstacle(800, 230, 50, 70),
+                            new Obstacle(1100, 210, 50, 90)];
 
         this.input = {
             left: false,
