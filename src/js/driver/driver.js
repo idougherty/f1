@@ -71,6 +71,23 @@ class Stats{
         return((100*age-1000)/age)*this.eMult;
     }
 
+    pick(list){
+        var p1, p2, p3;
+        p1 = Math.floor(Math.random() * list.length);
+        p2 = Math.floor(Math.random() * (list.length-1));
+        if (p1 === p2) {
+            p2++;
+        }
+        p2 = Math.floor(Math.random() * (list.length - 2));
+        if (p3 === p1) {
+            p3++;
+        }
+        if (p3 === p2) {
+            p3++;
+        }
+        return list[p1]+list[p2]+list[p3];
+    }
+
     pickles(p){
         return p;
     }
@@ -147,6 +164,12 @@ class Stats{
         this.moral = Math.random()*100;
         this.pubP = 50;
         this.sign = this.zodiac;
+        this.accel = [this.dExp, this.ambition, this.risk, this.sex, this.los];
+        this.deccel = [this.neck, this.intel, this.percept, this.dExp, this.plat, this.los];
+        this.corn = [this.neck, 100-this.tired, this.intel, this.percept, this.dExp, this.creative, this.plat, this.self, this.los];
+        this.riskR = [this.tired, this.exp, this.risk, this.ambition, this.sex, this.ego, this.agression];
+        this.pass = [this.neck, 100-this.tired, this.intel, this.percept, this.dExp, this.creative, this.risk, this.sex, this.ego, this.agression, this.self, this.los];
+        this.gas = [100-this.tired, this.dExp, this.risk, this.ambition, this.sex, this.ego, this.agression, this.los];
     }
     bonk(){
         console.log('neck ' + this.neck);  
