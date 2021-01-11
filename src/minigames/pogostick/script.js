@@ -5,7 +5,6 @@ ctx.mozImageSmoothingEnabled = false;
 
 var STICK_HEIGHT = 24;
 var JUMP_STRENGTH = 7;
-var SCREEN_DIMS = {width: 720, height: 480};
 
 class PogoDude {
     constructor(x, y) {
@@ -91,8 +90,7 @@ class PogoDude {
 
     draw() {
         ctx.save();
-        console.log(ctx);
-        ctx.translate(SCREEN_DIMS.width / 2, SCREEN_DIMS.height / 2);
+        ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.rotate(this.rotation / 180 * Math.PI);
         ctx.drawImage(this.sprite, this.sprite.width / -2, this.sprite.height / -2, this.sprite.width, this.sprite.height);
         ctx.restore();
@@ -119,6 +117,11 @@ class PogoDude {
     get_base_point() {
         return {x: this.x - STICK_HEIGHT * Math.sin(this.rotation / 180 * Math.PI),
                 y: this.y + STICK_HEIGHT * Math.cos(this.rotation / 180 * Math.PI)}
+    }
+
+    get_head_point() {
+        return {x: this.x + STICK_HEIGHT * Math.sin(this.rotation / 180 * Math.PI),
+                y: this.y - STICK_HEIGHT * Math.cos(this.rotation / 180 * Math.PI)}
     }
 
     move_to(x, y) {
@@ -154,14 +157,23 @@ class Obstacle {
     }
 }
 
+class WinBlock extends Obstacle {
+    constructor(x, y, width, height) {
+        super(x, y, width, height);
+        this.sprite.src = "assets/win_block.png";
+    }
+}
+
 class Game {
     constructor() {
         this.restart();
     }
 
     restart() {
-        this.running = true;
-        this.pogo_dude = new PogoDude(SCREEN_DIMS.width/2, SCREEN_DIMS.height/2);
+        this.run_state = "running";
+        this.pogo_dude = new PogoDude(canvas.width/2, canvas.height/2);
+
+        this.win_block = new WinBlock(800, 0, 100, 50);
 
         this.obstacles = [];
         this.obstacles.push(new Obstacle(200, 300, 300, 30));
@@ -179,21 +191,38 @@ class Game {
 
     update(dt) {
 
-        let collision = false;
+        if (this.run_state == "running") {
+            let collision = false;
 
-        let pt = this.pogo_dude.get_base_point();
+            let spring_pt = this.pogo_dude.get_base_point();
+            let head_pt = this.pogo_dude.get_head_point();
 
-        for (var i = 0; i < this.obstacles.length; i++) {
-            if (this.obstacles[i].point_intersects(pt.x, pt.y)) {
-                collision = true;
-                break;
+            if (this.win_block.point_intersects(spring_pt.x, spring_pt.y) ||
+                this.win_block.point_intersects(head_pt.x, head_pt.y)) {
+
+                this.run_state = "win";
             }
-        }
+            
 
-        this.pogo_dude.update(this.input, collision, dt);
+            for (var i = 0; i < this.obstacles.length; i++) {
+                if (this.obstacles[i].point_intersects(spring_pt.x, spring_pt.y)) {
+                    collision = true;
+                    break;
+                }
+                if (this.obstacles[i].point_intersects(head_pt.x, head_pt.y)) {
+                    this.run_state = "bonk";
+                }
+            }
+            if (this.pogo_dude.y > 1000) {
+                this.run_state = "worldborder";
+            }
 
-        if (!this.running) {
-            this.restart();
+            this.pogo_dude.update(this.input, collision, dt);
+        } else {
+            if (this.input.jump) {
+                this.restart();
+            }
+            
         }
     }
 
@@ -202,11 +231,37 @@ class Game {
         ctx.fillStyle = "#55BBFF";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        let offset = {x: this.pogo_dude.x - SCREEN_DIMS.width / 2, y: this.pogo_dude.y - SCREEN_DIMS.height / 2};
+        let offset = {x: this.pogo_dude.x - canvas.width / 2, y: this.pogo_dude.y - canvas.height / 2};
 
         this.pogo_dude.draw();
+        this.win_block.draw(offset);
         for (var i = 0; i < this.obstacles.length; i++) {
             this.obstacles[i].draw(offset);
+        }
+
+        if (this.run_state == "bonk") {
+            // display bonk failure
+            ctx.fillStyle = "white";
+            ctx.font = "32px Courier New";
+            ctx.fillText("You Bonked your head", canvas.width/2 - 200, canvas.height/2 - 20);
+            ctx.font = "20px Courier New";
+            ctx.fillText("Press Space to try again", canvas.width/2 - 150, canvas.height/2 + 20);
+        }
+        if (this.run_state == "worldborder") {
+            // display fall out of world failure
+            ctx.fillStyle = "white";
+            ctx.font = "32px Courier New";
+            ctx.fillText("You fell out of the world", canvas.width/2 - 240, canvas.height/2 - 20);
+            ctx.font = "20px Courier New";
+            ctx.fillText("Press Space to try again", canvas.width/2 - 150, canvas.height/2 + 20);
+        }
+        if (this.run_state == "win") {
+            // display win message
+            ctx.fillStyle = "white";
+            ctx.font = "32px Courier New";
+            ctx.fillText("Yay you made it", canvas.width/2 - 160, canvas.height/2 - 20);
+            ctx.font = "20px Courier New";
+            ctx.fillText("Nice job", canvas.width/2 - 80, canvas.height/2 + 20);
         }
     }
 }
