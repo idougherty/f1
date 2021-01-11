@@ -40,13 +40,13 @@ class Urinal {
     constructor (y, speed){
         this.x = 0;
         this.y = y;
-        this.vx = 5;
+        this.vx = 10;
         this.empty = true;
         if(speed == 2){
-            this.vx = 10;
+            this.vx = 20;
         }
         if(speed == 3){
-            this.vx = 20;
+            this.vx = 30;
         }
 
         let urinalEmpty = new Image(50, 100);
