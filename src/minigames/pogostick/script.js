@@ -192,11 +192,13 @@ class Game {
             right: false,
             jump: false
         };
+
+        this.clock = 0;
     }
 
     update(dt) {
-
         if (this.run_state == "running") {
+            this.clock += dt;
             let collision = false;
 
             let spring_pt = this.pogo_dude.get_base_point();
@@ -268,6 +270,10 @@ class Game {
             ctx.font = "20px Courier New";
             ctx.fillText("Nice job", canvas.width/2 - 80, canvas.height/2 + 20);
         }
+
+        ctx.fillStyle = "white";
+        ctx.font = "24px Courier New";
+        ctx.fillText(parseFloat(this.clock/1000).toFixed(2), 30, 40);
     }
 }
 
@@ -279,7 +285,7 @@ get_time = function() {
     return t;
 }
 
-let last_time = 0;
+let last_time = get_time();
 let current_time = get_time();
 setInterval(function() {
     current_time = get_time();
