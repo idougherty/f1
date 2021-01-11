@@ -56,7 +56,7 @@ class car {
 		return (this.eng.maxRev*this.acceleration)/this.aero.drag;
 	}
 
-	deceleration(){
+	decceleration(){
 		//traction, breaks, weight, drag 
 		return (this.traction * this.brake.quality + this.aero.drag)/this.weight
 	}
