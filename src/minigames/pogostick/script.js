@@ -6,7 +6,7 @@ ctx.mozImageSmoothingEnabled = false;
 let STICK_HEIGHT = 24;
 let JUMP_STRENGTH = 7;
 
-let INFINITE_WORLD = true;
+let INFINITE_WORLD = false;
 let OBSTACLES_PER_CHUNK = 5;
 let RENDER_DIST = 1;
 
@@ -89,7 +89,7 @@ class PogoDude {
         }
 
         // Control the spin (dont let it get too crazy)
-        this.drot *= 0.998;
+        this.drot *= 0.99;
         if (this.drot > 4) {
             this.drot = 4;
         }
@@ -145,15 +145,21 @@ class PogoDude {
 }
 
 class Obstacle {
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, type = "block") {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.rotation = 0;
-
         this.sprite = new Image(8, 8);
         this.sprite.src = "assets/obstacle.png";
+        if (type == "win") {
+            this.interaction = "win";
+            this.sprite.src = "assets/win_block.png";
+        } else {
+            this.interaction = "bounce"
+            this.sprite.src = "assets/obstacle.png";
+        }
     }
 
     point_intersects(x, y) {
@@ -167,19 +173,44 @@ class Obstacle {
     }
 }
 
-class WinBlock extends Obstacle {
-    constructor(x, y, width, height) {
-        super(x, y, width, height);
-        this.sprite.src = "assets/win_block.png";
-    }
-}
+let level1 = [
+    new Obstacle(200, 300, 1000, 30),
+    new Obstacle(500, 250, 50, 50),
+    new Obstacle(800, 230, 50, 70),
+    new Obstacle(1100, 210, 50, 90),
+    new Obstacle(1200, 300, 200, 30, "win")
+];
 
-let hard_level = [  new Obstacle(200, 300, 300, 30),
-                    new Obstacle(400, 100, 100, 200),
-                    new Obstacle(50, 0, 100, 300),
-                    new Obstacle(500, 100, 300, 20),
-                    new Obstacle(500, 100, 300, 20),
-                    new Obstacle(800, 50, 100, 250)];
+let level2 = [
+    new Obstacle(200, 300, 300, 30),
+    new Obstacle(400, 100, 100, 200),
+    new Obstacle(50, 0, 100, 300),
+    new Obstacle(500, 100, 300, 20),
+    new Obstacle(500, 100, 300, 20),
+    new Obstacle(800, 50, 100, 250),
+    new Obstacle(800, 0, 100, 50, "win")
+];
+
+let level3 = [
+    new Obstacle(200, 300, 300, 30),
+    new Obstacle(200, -300, 30, 600),
+    new Obstacle(470, -300, 30, 600),
+    new Obstacle(200, -330, 300, 30, "win")
+];
+
+let level4 = [
+    new Obstacle(200, 300, 500, 30),
+    new Obstacle(700, -100, 30, 430),
+    new Obstacle(300, -100, 200, 200),
+    new Obstacle(300, -130, 200, 30, "win")
+];
+
+let level5 = [
+    new Obstacle(200, 300, 1000, 30),
+    new Obstacle(500, -500, 400, 550),
+    new Obstacle(1200, -300, 30, 630),
+    new Obstacle(-30, -30, 60, 60, "win")
+];
 
 class Chunk {
     constructor(x, y, num_obstacles) {
@@ -242,16 +273,16 @@ class Game {
         this.generated_chunks = [];
         this.obstacles = [];
         if (!INFINITE_WORLD) {
-            this.win_block = new WinBlock(1200, 300, 200, 30);
+            //
+            // MANUAL LEVEL SET
+            //
 
-            this.obstacles = [  new Obstacle(200, 300, 1000, 30),
-                                new Obstacle(500, 250, 50, 50),
-                                new Obstacle(800, 230, 50, 70),
-                                new Obstacle(1100, 210, 50, 90)];
+            this.obstacles = level5;
+
+            //
+            // MANUAL LEVEL SET
+            //
         } else {
-            // just so that the win block is always defined. Try winning though lol. It's not too far actually
-            // TODO: make this fit in with the other obstacles so it doesn't have to be treated seperately
-            this.win_block = new WinBlock(10000, 0, 10, 10);
             this.generate_chunk(0, 0, 0);
         }
 
@@ -282,14 +313,8 @@ class Game {
             let spring_pt = this.pogo_dude.get_base_point();
             let head_pt = this.pogo_dude.get_head_point();
 
-            if (this.win_block.point_intersects(spring_pt.x, spring_pt.y) ||
-                this.win_block.point_intersects(head_pt.x, head_pt.y)) {
-
-                this.run_state = "win";
-            }
-    
             if (INFINITE_WORLD) {
-                let offset_vecs = []; //[[0, 0], [1, 1], [1, 0], [1, -1], [0, 1], [0, -1], [-1, 1], [-1, 0], [-1, -1]];
+                let offset_vecs = [];
                 for (let a = -RENDER_DIST; a <= RENDER_DIST; a++){
                     for (let b = -RENDER_DIST; b <= RENDER_DIST; b++){
                         offset_vecs.push([a, b]);
@@ -312,11 +337,21 @@ class Game {
 
             for (let i = 0; i < this.obstacles.length; i++) {
                 if (this.obstacles[i].point_intersects(spring_pt.x, spring_pt.y)) {
-                    collision = true;
+                    if (this.obstacles[i].interaction == "win") {
+                        this.run_state = "win";
+                    } else {
+                        collision = true;
+                    }
                     break;
                 }
                 if (this.obstacles[i].point_intersects(head_pt.x, head_pt.y)) {
-                    this.run_state = "bonk";
+                    if (this.obstacles[i].interaction == "win") {
+                        this.run_state = "win";
+                    } else {
+                        this.run_state = "bonk";
+                    }
+                    console.log(this.obstacles[i])
+                    break;
                 }
             }
 
@@ -337,7 +372,6 @@ class Game {
         let offset = {x: this.pogo_dude.x - canvas.width / 2, y: this.pogo_dude.y - canvas.height / 2};
 
         this.pogo_dude.draw();
-        this.win_block.draw(offset);
         for (let i = 0; i < this.obstacles.length; i++) {
             this.obstacles[i].draw(offset);
         }
@@ -400,6 +434,31 @@ document.addEventListener("keydown", function(k) {
             break;
         case 32:
             game.input.jump = true;
+            break;
+        case 49:
+            if (game.run_state != "running") {
+                game.obstacles = level1;
+            }
+            break;
+        case 50:
+            if (game.run_state != "running") {
+                game.obstacles = level2;
+            }
+            break;
+        case 51:
+            if (game.run_state != "running") {
+                game.obstacles = level3;
+            }
+            break;
+        case 52:
+            if (game.run_state != "running") {
+                game.obstacles = level4;
+            }
+            break;
+        case 53:
+            if (game.run_state != "running") {
+                game.obstacles = level5;
+            }
             break;
         default:
     }
