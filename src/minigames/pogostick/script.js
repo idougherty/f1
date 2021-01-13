@@ -1,10 +1,19 @@
-var canvas = document.getElementById("paper");
-var ctx = canvas.getContext("2d");
+let canvas = document.getElementById("paper");
+let ctx = canvas.getContext("2d");
 ctx.imageSmoothingEnabled = false;
 ctx.mozImageSmoothingEnabled = false;
 
-var STICK_HEIGHT = 24;
-var JUMP_STRENGTH = 7;
+let STICK_HEIGHT = 24;
+let JUMP_STRENGTH = 7;
+
+let INFINITE_WORLD = true;
+let OBSTACLES_PER_CHUNK = 5;
+
+AABB = function(obs1, obs2) {
+    let x_overlap = obs1.x < obs2.x + obs2.width && obs1.x + obs1.width < obs2.x;
+    let y_overlap = obs1.y < obs2.y + obs2.height && obs1.y + obs1.height < obs2.y;
+    return x_overlap && y_overlap;
+}
 
 class PogoDude {
     constructor(x, y) {
@@ -98,9 +107,9 @@ class PogoDude {
 
     rotate(deg) {
         deg = deg % 360;
-        var theta1 = this.rotation;
-        var theta2 = deg;
-        var theta3 = theta1 + theta2;
+        let theta1 = this.rotation;
+        let theta2 = deg;
+        let theta3 = theta1 + theta2;
         this.rotation += deg;
         if (this.rotation <= -180) {
             this.rotation += 360;
@@ -164,12 +173,62 @@ class WinBlock extends Obstacle {
     }
 }
 
-var hard_level = [  new Obstacle(200, 300, 300, 30),
+let hard_level = [  new Obstacle(200, 300, 300, 30),
                     new Obstacle(400, 100, 100, 200),
                     new Obstacle(50, 0, 100, 300),
                     new Obstacle(500, 100, 300, 20),
                     new Obstacle(500, 100, 300, 20),
                     new Obstacle(800, 50, 100, 250)];
+
+class Chunk {
+    constructor(x, y, num_obstacles) {
+        this.x = x;
+        this.y = y;
+        this.obstacles = [];
+        for (let i = 0; i < num_obstacles; i++) {
+            this.push_random_obstacle();
+        }
+    }
+
+    push_random_obstacle() {
+        let p = Math.random();
+            if (p <= 0.5) {
+                this.push_long_obstacle();
+            } else if (p < 0.7) {
+                this.push_tall_obstacle();
+            } else {
+                this.push_box_obstacle();
+            }
+    }
+
+    push_long_obstacle() {
+        let w = Math.floor((1 + Math.random()) * canvas.width / 3);
+        let h = Math.floor((1 + Math.random()) * canvas.height / 20);
+        let x = this.x * canvas.width + Math.floor(Math.random() * canvas.width) - w;
+        let y = this.y * canvas.height + Math.floor(Math.random() * canvas.width) - h;
+        
+        let obs = new Obstacle(x, y, w, h);
+        this.obstacles.push(obs);
+    }
+    push_tall_obstacle() {
+        let w = Math.floor((1 + Math.random()) * canvas.width / 20);
+        let h = Math.floor((1 + Math.random()) * canvas.height / 4);
+        let x = this.x * canvas.width + Math.floor(Math.random() * canvas.width) - w;
+        let y = this.y * canvas.height + Math.floor(Math.random() * canvas.width) - h;
+        
+        let obs = new Obstacle(x, y, w, h);
+        this.obstacles.push(obs);
+    }
+    push_box_obstacle() {
+        let w = Math.floor((1 + Math.random()) * canvas.width / 10);
+        let x = this.x * canvas.width + Math.floor(Math.random() * canvas.width) - w;
+        let y = this.y * canvas.height + Math.floor(Math.random() * canvas.width) - w;
+        
+        let obs = new Obstacle(x, y, w, w);
+        this.obstacles.push(obs);
+    }
+    
+}
 
 class Game {
     constructor() {
@@ -179,13 +238,21 @@ class Game {
     restart() {
         this.run_state = "running";
         this.pogo_dude = new PogoDude(canvas.width/2, canvas.height/2);
+        this.generated_chunks = [];
+        this.obstacles = [];
+        if (!INFINITE_WORLD) {
+            this.win_block = new WinBlock(1200, 300, 200, 30);
 
-        this.win_block = new WinBlock(1200, 300, 200, 30);
-
-        this.obstacles = [  new Obstacle(200, 300, 1000, 30),
-                            new Obstacle(500, 250, 50, 50),
-                            new Obstacle(800, 230, 50, 70),
-                            new Obstacle(1100, 210, 50, 90)];
+            this.obstacles = [  new Obstacle(200, 300, 1000, 30),
+                                new Obstacle(500, 250, 50, 50),
+                                new Obstacle(800, 230, 50, 70),
+                                new Obstacle(1100, 210, 50, 90)];
+        } else {
+            // just so that the win block is always defined. Try winning though lol. It's not too far actually
+            // TODO: make this fit in with the other obstacles so it doesn't have to be treated seperately
+            this.win_block = new WinBlock(10000, 0, 10, 10);
+            this.generate_chunk(0, 0, 0);
+        }
 
         this.input = {
             left: false,
@@ -194,6 +261,16 @@ class Game {
         };
 
         this.clock = 0;
+    }
+
+    generate_chunk(chunk_x, chunk_y, num_obstacles) {
+        if (chunk_x + "," + chunk_y in this.generated_chunks) {
+            return;
+        }
+
+        this.generated_chunks[chunk_x + "," + chunk_y] = new Chunk(chunk_x, chunk_y, num_obstacles);
+        
+        
     }
 
     update(dt) {
@@ -209,9 +286,30 @@ class Game {
 
                 this.run_state = "win";
             }
-            
+    
+            if (INFINITE_WORLD) {
+                let offset_vecs = []; //[[0, 0], [1, 1], [1, 0], [1, -1], [0, 1], [0, -1], [-1, 1], [-1, 0], [-1, -1]];
+                for (let a = -2; a < 3; a++){
+                    for (let b = -2; b < 3; b++){
+                        offset_vecs.push([a, b]);
+                    }
+                }
+                this.obstacles = [];
+                for (let i = 0; i < offset_vecs.length; i++) {
+                    let chunk_x = Math.floor(this.pogo_dude.x / canvas.width) + offset_vecs[i][0];
+                    let chunk_y = Math.floor(this.pogo_dude.y / canvas.width) + offset_vecs[i][1];
+                    console.log("generating chunk... %i %i", chunk_x, chunk_y);
+                    this.generate_chunk(chunk_x, chunk_y, OBSTACLES_PER_CHUNK);
 
-            for (var i = 0; i < this.obstacles.length; i++) {
+                    this.obstacles = this.obstacles.concat(this.generated_chunks[chunk_x + "," + chunk_y].obstacles);
+                }
+            } else {
+                if (this.pogo_dude.y > 1000) {
+                    this.run_state = "worldborder";
+                }
+            }
+
+            for (let i = 0; i < this.obstacles.length; i++) {
                 if (this.obstacles[i].point_intersects(spring_pt.x, spring_pt.y)) {
                     collision = true;
                     break;
@@ -219,9 +317,6 @@ class Game {
                 if (this.obstacles[i].point_intersects(head_pt.x, head_pt.y)) {
                     this.run_state = "bonk";
                 }
-            }
-            if (this.pogo_dude.y > 1000) {
-                this.run_state = "worldborder";
             }
 
             this.pogo_dude.update(this.input, collision, dt);
@@ -242,7 +337,7 @@ class Game {
 
         this.pogo_dude.draw();
         this.win_block.draw(offset);
-        for (var i = 0; i < this.obstacles.length; i++) {
+        for (let i = 0; i < this.obstacles.length; i++) {
             this.obstacles[i].draw(offset);
         }
 
@@ -277,7 +372,7 @@ class Game {
     }
 }
 
-var game = new Game();
+let game = new Game();
 
 get_time = function() {
     let d = new Date();
