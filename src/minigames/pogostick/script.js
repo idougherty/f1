@@ -6,9 +6,8 @@ ctx.mozImageSmoothingEnabled = false;
 let STICK_HEIGHT = 24;
 let JUMP_STRENGTH = 7;
 
-let INFINITE_WORLD = false;
 let OBSTACLES_PER_CHUNK = 5;
-let RENDER_DIST = 1;
+let RENDER_DIST = 2;
 
 AABB = function(obs1, obs2) {
     let x_overlap = obs1.x < obs2.x + obs2.width && obs1.x + obs1.width < obs2.x;
@@ -264,24 +263,17 @@ class Chunk {
 
 class Game {
     constructor() {
-        this.restart();
+        this.restart(level1);
     }
 
-    restart() {
+    restart(world = []) {
+        this.infinite_generation = world.length == 0;
         this.run_state = "running";
         this.pogo_dude = new PogoDude(canvas.width/2, canvas.height/2);
         this.generated_chunks = [];
         this.obstacles = [];
-        if (!INFINITE_WORLD) {
-            //
-            // MANUAL LEVEL SET
-            //
-
-            this.obstacles = level5;
-
-            //
-            // MANUAL LEVEL SET
-            //
+        if (!this.infinite_generation) {
+            this.obstacles = world;
         } else {
             this.generate_chunk(0, 0, 0);
         }
@@ -313,7 +305,7 @@ class Game {
             let spring_pt = this.pogo_dude.get_base_point();
             let head_pt = this.pogo_dude.get_head_point();
 
-            if (INFINITE_WORLD) {
+            if (this.infinite_generation) {
                 let offset_vecs = [];
                 for (let a = -RENDER_DIST; a <= RENDER_DIST; a++){
                     for (let b = -RENDER_DIST; b <= RENDER_DIST; b++){
@@ -339,14 +331,15 @@ class Game {
                 if (this.obstacles[i].point_intersects(spring_pt.x, spring_pt.y)) {
                     if (this.obstacles[i].interaction == "win") {
                         this.run_state = "win";
+                        break;
                     } else {
                         collision = true;
                     }
-                    break;
                 }
                 if (this.obstacles[i].point_intersects(head_pt.x, head_pt.y)) {
                     if (this.obstacles[i].interaction == "win") {
                         this.run_state = "win";
+                        break;
                     } else {
                         this.run_state = "bonk";
                     }
@@ -358,7 +351,11 @@ class Game {
             this.pogo_dude.update(this.input, collision, dt);
         } else {
             if (this.input.jump) {
-                this.restart();
+                if (this.infinite_generation) {
+                    this.restart();
+                } else {
+                    this.restart(this.obstacles);
+                }
             }
             
         }
@@ -437,27 +434,32 @@ document.addEventListener("keydown", function(k) {
             break;
         case 49:
             if (game.run_state != "running") {
-                game.obstacles = level1;
+                game.restart(level1);
             }
             break;
         case 50:
             if (game.run_state != "running") {
-                game.obstacles = level2;
+                game.restart(level2);
             }
             break;
         case 51:
             if (game.run_state != "running") {
-                game.obstacles = level3;
+                game.restart(level3);
             }
             break;
         case 52:
             if (game.run_state != "running") {
-                game.obstacles = level4;
+                game.restart(level4);
             }
             break;
         case 53:
             if (game.run_state != "running") {
-                game.obstacles = level5;
+                game.restart(level5);
+            }
+            break;
+        case 54:
+            if (game.run_state != "running") {
+                game.restart();
             }
             break;
         default:
