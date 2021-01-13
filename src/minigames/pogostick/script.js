@@ -8,6 +8,7 @@ let JUMP_STRENGTH = 7;
 
 let INFINITE_WORLD = true;
 let OBSTACLES_PER_CHUNK = 5;
+let RENDER_DIST = 1;
 
 AABB = function(obs1, obs2) {
     let x_overlap = obs1.x < obs2.x + obs2.width && obs1.x + obs1.width < obs2.x;
@@ -42,7 +43,7 @@ class PogoDude {
                 this.drot *= 0.25;
                 this.y -= this.dy / 2;
                 this.x -= this.dx / 2;
-                momentum = Math.max(JUMP_STRENGTH, Math.sqrt(this.dy ** 2 + this.dx ** 2) * 0.95);
+                momentum = Math.max(JUMP_STRENGTH, Math.sqrt(this.dy ** 2 + this.dx ** 2) * 0.9);
             }
 
             this.in_air = false;
@@ -192,7 +193,7 @@ class Chunk {
 
     push_random_obstacle() {
         let p = Math.random();
-            if (p <= 0.5) {
+            if (p < 0.5) {
                 this.push_long_obstacle();
             } else if (p < 0.7) {
                 this.push_tall_obstacle();
@@ -204,8 +205,8 @@ class Chunk {
     push_long_obstacle() {
         let w = Math.floor((1 + Math.random()) * canvas.width / 3);
         let h = Math.floor((1 + Math.random()) * canvas.height / 20);
-        let x = this.x * canvas.width + Math.floor(Math.random() * canvas.width) - w;
-        let y = this.y * canvas.height + Math.floor(Math.random() * canvas.width) - h;
+        let x = this.x * canvas.width + Math.floor(Math.random() * (canvas.width - w));
+        let y = this.y * canvas.height + Math.floor(Math.random() * (canvas.height - h));
         
         let obs = new Obstacle(x, y, w, h);
         this.obstacles.push(obs);
@@ -213,16 +214,16 @@ class Chunk {
     push_tall_obstacle() {
         let w = Math.floor((1 + Math.random()) * canvas.width / 20);
         let h = Math.floor((1 + Math.random()) * canvas.height / 4);
-        let x = this.x * canvas.width + Math.floor(Math.random() * canvas.width) - w;
-        let y = this.y * canvas.height + Math.floor(Math.random() * canvas.width) - h;
+        let x = this.x * canvas.width + Math.floor(Math.random() * (canvas.width - w));
+        let y = this.y * canvas.height + Math.floor(Math.random() * (canvas.height - h));
         
         let obs = new Obstacle(x, y, w, h);
         this.obstacles.push(obs);
     }
     push_box_obstacle() {
         let w = Math.floor((1 + Math.random()) * canvas.width / 10);
-        let x = this.x * canvas.width + Math.floor(Math.random() * canvas.width) - w;
-        let y = this.y * canvas.height + Math.floor(Math.random() * canvas.width) - w;
+        let x = this.x * canvas.width + Math.floor(Math.random() * (canvas.width - w));
+        let y = this.y * canvas.height + Math.floor(Math.random() * (canvas.height - w));
         
         let obs = new Obstacle(x, y, w, w);
         this.obstacles.push(obs);
@@ -267,7 +268,7 @@ class Game {
         if (chunk_x + "," + chunk_y in this.generated_chunks) {
             return;
         }
-
+        console.log("generating chunk... %i %i", chunk_x, chunk_y);
         this.generated_chunks[chunk_x + "," + chunk_y] = new Chunk(chunk_x, chunk_y, num_obstacles);
         
         
@@ -289,8 +290,8 @@ class Game {
     
             if (INFINITE_WORLD) {
                 let offset_vecs = []; //[[0, 0], [1, 1], [1, 0], [1, -1], [0, 1], [0, -1], [-1, 1], [-1, 0], [-1, -1]];
-                for (let a = -2; a < 3; a++){
-                    for (let b = -2; b < 3; b++){
+                for (let a = -RENDER_DIST; a <= RENDER_DIST; a++){
+                    for (let b = -RENDER_DIST; b <= RENDER_DIST; b++){
                         offset_vecs.push([a, b]);
                     }
                 }
@@ -298,7 +299,7 @@ class Game {
                 for (let i = 0; i < offset_vecs.length; i++) {
                     let chunk_x = Math.floor(this.pogo_dude.x / canvas.width) + offset_vecs[i][0];
                     let chunk_y = Math.floor(this.pogo_dude.y / canvas.width) + offset_vecs[i][1];
-                    console.log("generating chunk... %i %i", chunk_x, chunk_y);
+                    
                     this.generate_chunk(chunk_x, chunk_y, OBSTACLES_PER_CHUNK);
 
                     this.obstacles = this.obstacles.concat(this.generated_chunks[chunk_x + "," + chunk_y].obstacles);
