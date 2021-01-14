@@ -185,10 +185,10 @@ class ToothRunner{
     }
 
     draw(){
+        this.backDrops.draw();
         for(let tooth of this.teeth) {
             tooth.draw();
         }
-        this.backDrops.draw();
         if(!this.gameOver) {
             this.tool.draw();
         } else {
