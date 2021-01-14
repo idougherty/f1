@@ -128,10 +128,10 @@ class Car {
 
 class Road {
     constructor() {
-        this.x = canvas.width/2 - 320;
+        this.x = canvas.width/2 - 240;
         this.y = 0;
 
-        let sprite = new Image(640, 480);
+        let sprite = new Image(480, 480);
         sprite.src = "assets/road.png";
         this.sprite = sprite;
     }
@@ -199,7 +199,7 @@ class Frog {
         if(Math.abs(this.vx) < 1) {
             c.drawImage(this.sprite, this.x, this.y, this.sprite.width, this.sprite.height);
         } else {
-            c.drawImage(this.sprite2, this.x, this.y, this.sprite.width, this.sprite.height);
+            c.drawImage(this.sprite2, this.x, this.y, this.sprite2.width, this.sprite2.height);
         }
         // c.fillStyle = "green";
         // c.fillRect(this.x, this.y, this.sprite.width, this.sprite.height);
@@ -245,7 +245,7 @@ class FrogHandler {
             
             this.frogs.push(new Frog(fx, fy, fdir, fjumpTimer, fvx));
 
-            count++
+            count++;
         }
     }
 
