@@ -44,11 +44,11 @@ class TypeRunner{
     update(dt){
         if(!this.gameLost){
             this.clock += dt;
+            for(let i = 0; i < playerInput.length; i++){
+                this.assembledInput = this.assembledInput + playerInput[i];
+            }
         }
         
-        for(let i = 0; i < playerInput.length; i++){
-            this.assembledInput = this.assembledInput + playerInput[i];
-        }
         
         if(this.clock >= this.endTime){
             this.clock = this.endTime;
