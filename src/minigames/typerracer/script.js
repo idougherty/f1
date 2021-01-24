@@ -1,6 +1,10 @@
 let canvas = document.getElementById("paper");
 let c = canvas.getContext("2d");
-const quoteList = ['Hello my name is Aydin', 'I hope that this works', 'The quick brown fox jumped over the lazy dog','Another filler sentence I made', 'Woop woo'];
+const quoteList = [ 'Hello my name is Aydin',
+                    'I hope that this works', 
+                    'The quick brown fox jumped over the lazy dog','Another filler sentence I made', 
+                    'Woop woo',  
+                    'If you or a loved one has been diagnosed with mesothelioma, you may be entitled to financial compensation.'];
 
 playerInput = [];
 

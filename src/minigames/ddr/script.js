@@ -66,14 +66,14 @@ class Arrow {
 }
 
 class Particle {
-    constructor(x, y, d, vx, vy, vd) {
+    constructor(x, y, d, vx, vy, vd, size = 7) {
         this.x = x;
         this.y = y;
         this.d = d;
         this.vx = vx;
         this.vy = vy;
         this.vd = vd;
-        this.size = 7;
+        this.size = size;
     }
 
     update() {
@@ -156,7 +156,7 @@ class Target {
 class Dancer {
     constructor() {
         this.formTimer = 0;
-        this.health = 5;
+        this.health = 3;
         this.red = 0;
         this.sprites = {};
         
@@ -245,6 +245,7 @@ class DDRHandler {
         this.arrowTimer = 0;
         this.tilt = 0;
         this.dtilt = 0;
+        this.levels = 35;
         this.UIOpacity = 1;
         this.particles = [];
         this.gameOver = false;
@@ -299,7 +300,7 @@ class DDRHandler {
                 }
 
                 this.dancer.switchForm(target.dir);
-            } 
+            }
 
             for(let i = target.arrows.length - 1; i >= 0; i--) {
                 target.arrows[i].update();
@@ -327,8 +328,33 @@ class DDRHandler {
             this.winState = false;
         }
 
+        if(this.levels <= 0) {
+            this.gameOver = true;
+            this.winState = true;
+
+            for(const [idx, target] of Object.entries(this.target)) {
+                for(const arrow of target.arrows) {
+                    for(let i = 0; i < 36; i++) {
+                        const x = arrow.x + Math.random() * Arrow.WIDTH;
+                        const y = arrow.y + Math.random() * Arrow.HEIGHT;
+                        const d = Math.random() * Math.PI * 2; 
+                        
+                        const vx = Math.random() * 10 - 5;
+                        const vy = Math.random() * 10 - 5;
+                        const vd = Math.random() * .5 - .25; 
+                        const size = 10;
+                        
+                        const p = new Particle(x, y, d, vx, vy, vd, size);
+                        this.particles.push(p);
+                    }
+                }
+            }
+        }
+
         if(this.arrowTimer > 40) {
-            this.spawnArrows();
+            if(this.levels > 0) {
+                this.spawnArrows();
+            }
 
             this.arrowTimer = 0
         }
@@ -368,6 +394,7 @@ class DDRHandler {
     }
 
     spawnArrows() {
+        this.levels--;
         const spacing = 20;
 
         if(Math.random() < .25) {
@@ -420,7 +447,9 @@ class DDRHandler {
         c.translate(-canvas.width/2, -canvas.height/2);
 
         this.dancer.drawLight();
+        c.globalAlpha = this.UIOpacity;
         this.dancer.drawStars();
+        c.globalAlpha = 1;
 
         
         c.globalCompositeOperation = "difference";
