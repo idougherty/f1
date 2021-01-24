@@ -80,11 +80,11 @@ class Tooth {
     }
     
     draw(){
-        if(this.isBroken){
-            c.drawImage(this.spriteBad, this.x, this.y, this.spriteBad.width, this.spriteBad.height);
+        if(!this.isBroken){
+            c.drawImage(this.sprite, this.x, this.y, this.sprite.width, this.sprite.height);  
         }
         else{
-            c.drawImage(this.sprite, this.x, this.y, this.sprite.width, this.sprite.height);  
+            c.drawImage(this.spriteBad, this.x, this.y, this.spriteBad.width, this.spriteBad.height);
         }
     }
 
@@ -111,8 +111,10 @@ class ToothyTool{
         if(mouse.left && (mouse.x < this.x + 50 && mouse.x > this.x - 50 && mouse.y < this.y + 25 && mouse.y > this.y - 25)) {
             this.down = true;
             this.closed = true;
-            this.x = mouse.x;
-            this.y = mouse.y;
+            if(mouse.x + 50 < canvas.width && mouse.x - 50 > 0 && mouse.y - 25 > 0 && mouse.y + 25 < canvas.height){
+                this.x = mouse.x;
+                this.y = mouse.y;
+            }
         }
 
         if(!mouse.left){
@@ -144,7 +146,13 @@ class ToothRunner{
         this.tool = new ToothyTool();
         this.backDrops = new Backdrops();
         this.stageOneOver = false;
+        
         this.gameOver = false;
+        this.gameWon = false;
+        this.gameLost = false;
+        this.clock = 0;
+        this.endTime = 60000;
+
         this.teeth.push(new Tooth( 175, 200));
         this.teeth.push(new Tooth( 375, 200));
         this.teeth.push(new Tooth( 175, 250));
@@ -159,8 +167,9 @@ class ToothRunner{
         this.teeth.push(new Tooth(550, 350));
     }
 
-    update(){
+    update(dt){
         if(!this.gameOver){
+            this.clock += dt;
             this.tool.update();
             for(let i = this.teeth.length - 1; i >= 0; i--) {      
                 if(this.tool.collision(this.teeth[i])) {
@@ -177,9 +186,16 @@ class ToothRunner{
                     this.teeth[this.teeth.length - 1].isDraggable = true;
                 }
             }
-    
+            
+            if(this.clock >= this.endTime){
+                this.clock = this.endTime;
+                this.gameOver = true;
+                this.gameLost = true;
+            }
+
             if(this.teeth[this.teeth.length - 1].x == this.initalX && this.teeth[this.teeth.length - 1].y == this.initalY){
                 this.gameOver = true;
+                this.gameWon = true;
             } 
         }
     }
@@ -187,27 +203,53 @@ class ToothRunner{
     draw(){
         this.backDrops.draw();
         for(let tooth of this.teeth) {
-            tooth.draw();
+            if(!tooth.isBroken)
+                tooth.draw();
         }
+        this.teeth[this.toothRandom].draw();
         if(!this.gameOver) {
             this.tool.draw();
         } else {
-            c.textAlign = "center";
-            c.textBaseline = "middle";
-            c.fillStyle = "black";
-            c.font = "30px Courier New";
-            c.fillText("Pro Dentist Man", canvas.width/2, canvas.height - 100);
+            if(this.gameWon){
+                c.textAlign = "center";
+                c.textBaseline = "middle";
+                c.fillStyle = "black";
+                c.font = "30px Courier New";
+                c.fillText("Pro Dentist Man", canvas.width/2, canvas.height - 100);
+            }
+            if(this.gameLost){
+                c.textAlign = "center";
+                c.textBaseline = "middle";
+                c.fillStyle = "black";
+                c.font = "30px Courier New";
+                c.fillText("Terrible Dentist Man", canvas.width/2, canvas.height - 100);
+
+            }
         }
     }
 }
 
 gameRunner = new ToothRunner();
+
+get_time = function() {
+    let d = new Date();
+    let t = d.getTime();
+    return t;
+}
+let last_time = get_time();
+let current_time = get_time();
+
+
+
+
 setInterval(function() {
     c.clearRect(0, 0, canvas.width, canvas.height);
     c.fillStyle = "#a3ffe5";
     c.fillRect(0, 0, canvas.width, canvas.height);
-
-    gameRunner.update();
+    
+    current_time = get_time();
+    gameRunner.update(current_time - last_time);
     gameRunner.draw();
+    last_time = current_time;
 
 }, 15);
